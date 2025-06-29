@@ -8,7 +8,9 @@ import {
   signOut as firebaseSignOut,
   GoogleAuthProvider,
   signInWithPopup,
-  signInWithEmailAndPassword
+  signInWithEmailAndPassword,
+  User as FirebaseUser,
+  AuthError
 } from 'firebase/auth'
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
 import { useRouter } from 'next/navigation'
@@ -35,7 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter()
 
   // Function to get or create user document
-  const getOrCreateUserDoc = async (firebaseUser: any) => {
+  const getOrCreateUserDoc = async (firebaseUser: FirebaseUser) => {
     const userRef = doc(db, 'users', firebaseUser.uid)
     const userDoc = await getDoc(userRef)
 
@@ -97,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await signInWithEmailAndPassword(auth, email, password)
       // Auth state listener will handle the rest
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error signing in with email:', error)
       throw error
     }

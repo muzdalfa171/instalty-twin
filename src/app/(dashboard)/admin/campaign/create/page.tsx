@@ -32,10 +32,7 @@ const CreateCampaign = () => {
           duration: 3000,
           position: 'top-center',
         });
-        // Short delay to show the success message before redirect
-        setTimeout(() => {
-          router.push('/admin/campaign');
-        }, 1000);
+        return result;
       }
     } catch (err) {
       setError('Failed to create campaign. Please try again.');
@@ -56,7 +53,7 @@ const CreateCampaign = () => {
 
       {/* Centered Form */}
       <div className="max-w-xl w-full mx-auto text-center">
-        <h1 className="text-2xl font-semibold mb-2">Let's create a new campaign</h1>
+        <h1 className="text-2xl font-semibold mb-2">Let&apos;s create a new campaign</h1>
         <p className="text-sm text-gray-500 mb-10">What would you like to name it?</p>
 
         <div className="text-left mb-6">
@@ -90,7 +87,7 @@ const CreateCampaign = () => {
           <button
             onClick={async () => {
               const result = await handleContinue();
-              if (result?.id) {
+              if (result?.success) {
                 router.push(`/admin/campaign/${result.id}`);
               }
             }}

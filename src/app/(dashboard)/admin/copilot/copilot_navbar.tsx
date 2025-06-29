@@ -13,7 +13,6 @@ interface MenuItem {
 
 interface SecondarySidebarProps {
   activeIcon: string | null
-  onClose?: () => void
   isCollapsed: boolean
   onToggleCollapse: () => void
 }
@@ -33,7 +32,7 @@ const industryMenuItems: MenuItem[] = [
   { id: "manufacturing", label: "Manufacturing" },
 ]
 
-export function SecondarySidebar({ activeIcon, onClose, isCollapsed, onToggleCollapse }: SecondarySidebarProps) {
+export function SecondarySidebar({ activeIcon, isCollapsed, onToggleCollapse }: SecondarySidebarProps) {
   const [expandedItems, setExpandedItems] = useState<string[]>(["industry-keywords"])
 
   const toggleExpanded = (itemId: string) => {
