@@ -10,7 +10,6 @@ import {
   signInWithPopup,
   signInWithEmailAndPassword,
   User as FirebaseUser,
-  AuthError
 } from 'firebase/auth'
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
 import { useRouter } from 'next/navigation'
