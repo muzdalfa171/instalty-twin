@@ -4,11 +4,15 @@ import { ChevronDown, ChevronRight, PanelLeftClose } from "lucide-react"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { useRouter } from "next/navigation"
+import AiDashboard from "./newchat"
 
 interface MenuItem {
   id: string
   label: string
   hasSubmenu?: boolean
+  submenuItems?: string[]
+  path?: string
 }
 
 interface SecondarySidebarProps {
@@ -18,30 +22,62 @@ interface SecondarySidebarProps {
 }
 
 const searchMenuItems: MenuItem[] = [
-  { id: "new-chat", label: "New chat", hasSubmenu: false },
-  { id: "memory", label: "Memory" },
-  { id: "tasks", label: "Tasks" },
-  { id: "settings", label: "Settings" },
+  { 
+    id: "new-chat", 
+    label: "New chat",
+    path: "/admin/copilot/newchat"
+  },
+  { id: "memory", label: "Memory", path: "/admin/copilot/memory" },
+  { id: "tasks", label: "Tasks", path: "/admin/copilot/tasks" },
+  { id: "settings", label: "Settings", path: "/admin/copilot/settings" },
 ]
 
 const industryMenuItems: MenuItem[] = [
-  { id: "technology", label: "Technology" },
-  { id: "healthcare", label: "Healthcare" },
-  { id: "finance", label: "Finance" },
-  { id: "retail", label: "Retail" },
-  { id: "manufacturing", label: "Manufacturing" },
+  { 
+    id: "technology", 
+    label: "Technology",
+    hasSubmenu: true,
+    submenuItems: ["Software Development", "Data Science", "Machine Learning"],
+    path: "/admin/copilot/industry/technology"
+  },
+  { id: "healthcare", label: "Healthcare", path: "/admin/copilot/industry/healthcare" },
+  { id: "finance", label: "Finance", path: "/admin/copilot/industry/finance" },
+  { id: "retail", label: "Retail", path: "/admin/copilot/industry/retail" },
+  { id: "manufacturing", label: "Manufacturing", path: "/admin/copilot/industry/manufacturing" },
 ]
 
 export function SecondarySidebar({ activeIcon, isCollapsed, onToggleCollapse }: SecondarySidebarProps) {
-  const [expandedItems, setExpandedItems] = useState<string[]>(["industry-keywords"])
+  const [expandedItems, setExpandedItems] = useState<string[]>([])
+  const [showNewChat, setShowNewChat] = useState(false)
+  const router = useRouter()
 
   const toggleExpanded = (itemId: string) => {
-    setExpandedItems((prev) => (prev.includes(itemId) ? prev.filter((id) => id !== itemId) : [...prev, itemId]))
+    setExpandedItems((prev) => 
+      prev.includes(itemId) ? prev.filter((id) => id !== itemId) : [...prev, itemId]
+    )
+  }
+
+  const handleItemClick = (item: MenuItem) => {
+    if (item.id === "new-chat") {
+      setShowNewChat(true)
+      router.push(item.path || '')
+      return
+    }
+    if (item.path) {
+      router.push(item.path)
+    }
+    if (item.hasSubmenu) {
+      toggleExpanded(item.id)
+    }
+  }
+
+  const handleSubmenuClick = (parentPath: string, submenuItem: string) => {
+    const path = `${parentPath}/${submenuItem.toLowerCase().replace(/\s+/g, '-')}`
+    router.push(path)
   }
 
   const menuItems = activeIcon === "search" ? searchMenuItems : industryMenuItems
 
-  // Don't render the sidebar at all when collapsed
   if (isCollapsed) {
     return null
   }
@@ -52,7 +88,13 @@ export function SecondarySidebar({ activeIcon, isCollapsed, onToggleCollapse }: 
         <h2 className="font-semibold text-gray-900">
           {activeIcon === "search" ? "Search Filters" : "Industry Categories"}
         </h2>
-        <Button variant="ghost" size="icon" onClick={onToggleCollapse} className="h-8 w-8" title="Collapse sidebar">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={onToggleCollapse} 
+          className="h-8 w-8" 
+          title="Collapse sidebar"
+        >
           <PanelLeftClose className="w-4 h-4" />
         </Button>
       </div>
@@ -62,32 +104,35 @@ export function SecondarySidebar({ activeIcon, isCollapsed, onToggleCollapse }: 
           {menuItems.map((item) => (
             <div key={item.id} className="mb-1">
               <button
-                onClick={() => item.hasSubmenu && toggleExpanded(item.id)}
+                onClick={() => handleItemClick(item)}
                 className={cn(
                   "w-full flex items-center justify-between px-3 py-2 text-sm rounded-md transition-colors",
-                  "hover:bg-gray-100 text-gray-700",
+                  item.id === "new-chat" 
+                    ? "bg-blue-500 hover:bg-blue-600 text-white font-medium"
+                    : "hover:bg-gray-100 text-gray-700"
                 )}
               >
                 <span>{item.label}</span>
-                {item.hasSubmenu &&
-                  (expandedItems.includes(item.id) ? (
+                {item.hasSubmenu && (
+                  expandedItems.includes(item.id) ? (
                     <ChevronDown className="w-4 h-4" />
                   ) : (
                     <ChevronRight className="w-4 h-4" />
-                  ))}
+                  )
+                )}
               </button>
 
-              {item.hasSubmenu && expandedItems.includes(item.id) && (
+              {item.hasSubmenu && expandedItems.includes(item.id) && item.submenuItems && (
                 <div className="ml-4 mt-1 space-y-1">
-                  <div className="px-3 py-1 text-xs text-gray-500 rounded-md hover:bg-gray-50 cursor-pointer">
-                    Software Development
-                  </div>
-                  <div className="px-3 py-1 text-xs text-gray-500 rounded-md hover:bg-gray-50 cursor-pointer">
-                    Data Science
-                  </div>
-                  <div className="px-3 py-1 text-xs text-gray-500 rounded-md hover:bg-gray-50 cursor-pointer">
-                    Machine Learning
-                  </div>
+                  {item.submenuItems.map((submenuItem) => (
+                    <div 
+                      key={submenuItem}
+                      onClick={() => handleSubmenuClick(item.path || '', submenuItem)}
+                      className="px-3 py-1 text-xs text-gray-500 rounded-md hover:bg-gray-50 cursor-pointer"
+                    >
+                      {submenuItem}
+                    </div>
+                  ))}
                 </div>
               )}
             </div>

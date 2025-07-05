@@ -88,7 +88,7 @@ const CreateCampaign = () => {
             onClick={async () => {
               const result = await handleContinue();
               if (result?.success) {
-                router.push(`/admin/campaign/${result.id}`);
+                router.push(`/admin/leads?name=${encodeURIComponent(campaignName)}`);
               }
             }}
             disabled={isLoading}

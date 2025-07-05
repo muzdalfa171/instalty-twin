@@ -1,44 +1,57 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ChevronDown, MoreVertical, Plus } from 'lucide-react';
-import { useRouter } from 'next/navigation'; // ✅ Correct import for App Router
+import { useRouter } from 'next/navigation';
+import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+
+interface Campaign {
+  id: string;
+  name: string;
+  status: string;
+  progress: string;
+  sent: string | number;
+  click: string | number;
+  replied: string | number;
+  opportunities: string | number;
+  createdAt: any;
+}
 
 const CampaignsPage = () => {
   const router = useRouter();
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const campaigns = [
-    {
-      id: 1,
-      name: "INDIRAP | Sales Teams",
-      status: "Draft",
-      progress: "-",
-      sent: "-",
-      click: "-",
-      replied: "-",
-      opportunities: "-"
-    },
-    {
-      id: 2,
-      name: "Tech Startups | Q4 2023",
-      status: "Active",
-      progress: "75%",
-      sent: "450",
-      click: "123",
-      replied: "45",
-      opportunities: "12"
-    },
-    {
-      id: 3,
-      name: "Enterprise | Decision Makers",
-      status: "Paused",
-      progress: "30%",
-      sent: "200",
-      click: "45",
-      replied: "15",
-      opportunities: "3"
-    }
-  ];
+  useEffect(() => {
+    const fetchCampaigns = async () => {
+      try {
+        const campaignsRef = collection(db, 'campaigns');
+        const q = query(campaignsRef, orderBy('createdAt', 'desc'));
+        const querySnapshot = await getDocs(q);
+        
+        const campaignsData = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          // Ensure all fields have values even if they're missing in Firestore
+          status: doc.data().status || 'Draft',
+          progress: doc.data().progress || '0%',
+          sent: doc.data().sent || '-',
+          click: doc.data().click || '-',
+          replied: doc.data().replied || '-',
+          opportunities: doc.data().opportunities || '-'
+        })) as Campaign[];
+
+        setCampaigns(campaignsData);
+      } catch (error) {
+        console.error('Error fetching campaigns:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCampaigns();
+  }, []);
 
   return (
     <div className="min-h-screen bg-white text-black px-8 py-6">
@@ -85,31 +98,37 @@ const CampaignsPage = () => {
           <div>OPPORTUNITIES</div>
         </div>
 
-        {campaigns.map((campaign) => (
-          <div key={campaign.id} className="grid grid-cols-8 items-center gap-2 px-4 py-4 hover:bg-gray-50 text-sm border-t">
-            <div className="flex items-center font-medium text-gray-800 col-span-2">
-              <input type="checkbox" className="mr-2" />
-              {campaign.name}
+        {loading ? (
+          <div className="text-center py-8 text-gray-500">Loading campaigns...</div>
+        ) : campaigns.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">No campaigns found</div>
+        ) : (
+          campaigns.map((campaign) => (
+            <div key={campaign.id} className="grid grid-cols-8 items-center gap-2 px-4 py-4 hover:bg-gray-50 text-sm border-t">
+              <div className="flex items-center font-medium text-gray-800 col-span-2">
+                <input type="checkbox" className="mr-2" />
+                {campaign.name}
+              </div>
+              <div>
+                <span className={`text-white text-xs px-2 py-1 rounded-full ${
+                  campaign.status.toLowerCase() === 'active' ? 'bg-green-600' :
+                  campaign.status.toLowerCase() === 'paused' ? 'bg-yellow-600' :
+                  'bg-gray-800'
+                }`}>
+                  {campaign.status}
+                </span>
+              </div>
+              <div className="text-center">{campaign.progress}</div>
+              <div className="text-center">{campaign.sent}</div>
+              <div className="text-center">{campaign.click}</div>
+              <div className="text-center">{campaign.replied}</div>
+              <div className="text-center relative">
+                {campaign.opportunities}
+                <MoreVertical className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 cursor-pointer" />
+              </div>
             </div>
-            <div>
-              <span className={`text-white text-xs px-2 py-1 rounded-full ${
-                campaign.status === 'Active' ? 'bg-green-600' :
-                campaign.status === 'Paused' ? 'bg-yellow-600' :
-                'bg-gray-800'
-              }`}>
-                {campaign.status}
-              </span>
-            </div>
-            <div className="text-center">{campaign.progress}</div>
-            <div className="text-center">{campaign.sent}</div>
-            <div className="text-center">{campaign.click}</div>
-            <div className="text-center">{campaign.replied}</div>
-            <div className="text-center relative">
-              {campaign.opportunities}
-              <MoreVertical className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 cursor-pointer" />
-            </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );
