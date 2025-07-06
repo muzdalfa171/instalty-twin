@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, Search, Filter, Loader2 } from 'lucide-react';
+import { ChevronLeft, Search, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { addLeadBatch, type Lead, type SupersearchMetadata } from '@/lib/leads';
 import { toast } from 'sonner';
@@ -14,13 +14,21 @@ interface SearchFilters {
   role?: string;
 }
 
+interface SearchResult {
+  email: string;
+  name: string;
+  company: string;
+  role: string;
+  industry: string;
+}
+
 const SupersearchPage: React.FC = () => {
   const router = useRouter();
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<SearchFilters>({});
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [selectedLeads, setSelectedLeads] = useState<Set<string>>(new Set());
 
   const handleSearch = async () => {
@@ -99,8 +107,8 @@ const SupersearchPage: React.FC = () => {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // Return mock data
-    return [
+    // Return mock data filtered by query and filters
+    const mockData: SearchResult[] = [
       {
         email: 'john@techcorp.com',
         name: 'John Tech',
@@ -115,8 +123,20 @@ const SupersearchPage: React.FC = () => {
         role: 'CEO',
         industry: 'Startup',
       },
-      // Add more mock results as needed
     ];
+
+    // Apply filters
+    return mockData.filter(result => {
+      const matchesQuery = 
+        result.name.toLowerCase().includes(query.toLowerCase()) ||
+        result.company.toLowerCase().includes(query.toLowerCase()) ||
+        result.role.toLowerCase().includes(query.toLowerCase());
+
+      const matchesIndustry = !filters.industry || result.industry === filters.industry;
+      const matchesRole = !filters.role || result.role === filters.role;
+
+      return matchesQuery && matchesIndustry && matchesRole;
+    });
   };
 
   return (

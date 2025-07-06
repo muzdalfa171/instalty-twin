@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from "react";
-import { ChevronLeft, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface Lead {
@@ -34,7 +34,7 @@ const mockLeads: Lead[] = [
 
 const LeadsTab: React.FC = () => {
   const router = useRouter();
-  const [leads, setLeads] = useState<Lead[]>(mockLeads);
+  const [leads] = useState<Lead[]>(mockLeads);
   const [selectedLeads, setSelectedLeads] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
 

@@ -15,7 +15,7 @@ interface Campaign {
   click: string | number;
   replied: string | number;
   opportunities: string | number;
-  createdAt: any;
+  createdAt: Date;
 }
 
 const CampaignsPage = () => {

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import LeadsTab from "./components/tabs/LeadsTab";
@@ -12,7 +12,14 @@ import Tabs from "./components/Tabs";
 
 const tabLabels = ["Analytics", "Leads", "Sequences", "Schedule", "Options"];
 
-const DashboardPage: React.FC = () => {
+// Loading fallback component
+const LoadingFallback = () => (
+  <div className="min-h-screen bg-white flex items-center justify-center">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+  </div>
+);
+
+const DashboardContent: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const campaignName = searchParams.get('name') || 'Untitled Campaign';
@@ -97,6 +104,14 @@ const DashboardPage: React.FC = () => {
         {renderTab()}
       </div>
     </div>
+  );
+};
+
+const DashboardPage: React.FC = () => {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <DashboardContent />
+    </Suspense>
   );
 };
 

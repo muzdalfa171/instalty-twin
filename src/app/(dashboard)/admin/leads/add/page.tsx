@@ -4,7 +4,7 @@ import React, { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, Upload, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { addSingleLead, addLeadBatch, processCSVUpload, processSheetsImport, type Lead } from '@/lib/leads';
+import { processCSVUpload, processSheetsImport } from '@/lib/leads';
 import { toast } from 'sonner';
 
 const AddLeadsPage: React.FC = () => {

@@ -1,5 +1,5 @@
 import { db } from './firebase';
-import { collection, addDoc, query, where, getDocs, DocumentData } from 'firebase/firestore';
+import { collection, addDoc, query, where, getDocs } from 'firebase/firestore';
 
 export interface Lead {
   email: string;
@@ -7,7 +7,7 @@ export interface Lead {
   company?: string;
   source: 'csv' | 'supersearch' | 'manual' | 'sheets';
   createdAt: Date;
-  metadata?: Record<string, any>;
+  metadata?: CSVUploadMetadata | SupersearchMetadata | GoogleSheetsMetadata;
 }
 
 export interface CSVUploadMetadata {
@@ -17,7 +17,12 @@ export interface CSVUploadMetadata {
 
 export interface SupersearchMetadata {
   searchQuery: string;
-  filters: Record<string, any>;
+  filters: {
+    industry?: string;
+    location?: string;
+    companySize?: string;
+    role?: string;
+  };
 }
 
 export interface GoogleSheetsMetadata {
@@ -51,15 +56,25 @@ export const getLeadsBySource = async (source: Lead['source'], userId: string): 
   const q = query(leadsCollection, where('source', '==', source));
   
   const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as Lead[];
+  return querySnapshot.docs.map(doc => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      email: data.email,
+      source: data.source,
+      createdAt: data.createdAt,
+      metadata: data.metadata,
+      ...data
+    } as Lead;
+  });
 };
 
 export const processCSVUpload = async (
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   file: File,
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   userId: string,
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   onProgress?: (progress: number) => void
 ): Promise<void> => {
   // Implementation for CSV processing will go here
@@ -67,7 +82,9 @@ export const processCSVUpload = async (
 };
 
 export const processSheetsImport = async (
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   sheetId: string,
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   userId: string
 ): Promise<void> => {
   // Implementation for Google Sheets import will go here

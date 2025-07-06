@@ -5,7 +5,6 @@ import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
-import AiDashboard from "./newchat"
 
 interface MenuItem {
   id: string
@@ -48,7 +47,6 @@ const industryMenuItems: MenuItem[] = [
 
 export function SecondarySidebar({ activeIcon, isCollapsed, onToggleCollapse }: SecondarySidebarProps) {
   const [expandedItems, setExpandedItems] = useState<string[]>([])
-  const [showNewChat, setShowNewChat] = useState(false)
   const router = useRouter()
 
   const toggleExpanded = (itemId: string) => {
@@ -59,7 +57,6 @@ export function SecondarySidebar({ activeIcon, isCollapsed, onToggleCollapse }: 
 
   const handleItemClick = (item: MenuItem) => {
     if (item.id === "new-chat") {
-      setShowNewChat(true)
       router.push(item.path || '')
       return
     }

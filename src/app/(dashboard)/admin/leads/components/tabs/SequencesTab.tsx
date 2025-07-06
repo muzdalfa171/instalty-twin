@@ -61,7 +61,7 @@ const SequencesTab: React.FC = () => {
 
   return (
     <div className="p-6">
-      {steps.map((step, index) => (
+      {steps.map((step) => (
         <div key={step.id} className="mb-6">
           <div className="bg-white rounded-lg border border-gray-200 p-6 mb-4 transition-shadow hover:shadow-md">
             <div className="mb-4">

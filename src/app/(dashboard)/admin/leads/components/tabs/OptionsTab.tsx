@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 
 // Reusable toggle buttons
@@ -307,7 +306,7 @@ export default function CampaignSettings() {
               <div>
                 <h3 className="text-[15px] font-medium text-gray-900 mb-1">Provider Matching</h3>
                 <p className="text-sm text-gray-500">
-                  Matches your lead's email provider with your mailbox provider for boosted deliverability. (Outlook to Outlook, Google to Google, etc.)<br />
+                  Matches your lead&apos;s email provider with your mailbox provider for boosted deliverability. (Outlook to Outlook, Google to Google, etc.)<br />
                   Configure custom rules for email sending based on email service providers
                 </p>
               </div>
