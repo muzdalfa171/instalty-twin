@@ -107,7 +107,12 @@ const CampaignsPage = () => {
             <div key={campaign.id} className="grid grid-cols-8 items-center gap-2 px-4 py-4 hover:bg-gray-50 text-sm border-t">
               <div className="flex items-center font-medium text-gray-800 col-span-2">
                 <input type="checkbox" className="mr-2" />
-                {campaign.name}
+                <span 
+                  className="cursor-pointer hover:text-blue-600"
+                  onClick={() => router.push(`/admin/leads?name=${encodeURIComponent(campaign.name)}`)}
+                >
+                  {campaign.name}
+                </span>
               </div>
               <div>
                 <span className={`text-white text-xs px-2 py-1 rounded-full ${
