@@ -19,16 +19,27 @@ interface SecondarySidebarProps {
   isCollapsed: boolean
   onToggleCollapse: () => void
 }
-
 const searchMenuItems: MenuItem[] = [
   { 
     id: "new-chat", 
     label: "New chat",
     path: "/admin/copilot/newchat"
   },
-  { id: "memory", label: "Memory", path: "/admin/copilot/memory" },
-  { id: "tasks", label: "Tasks", path: "/admin/copilot/tasks" },
-  { id: "settings", label: "Settings", path: "/admin/copilot/settings" },
+  { 
+    id: "memory",
+    label: "Memory",
+    path: "/admin/copilot/memory"
+  },
+  { 
+    id: "tasks", 
+    label: "Tasks", 
+    path: "/admin/copilot/tasks" 
+  },
+  { 
+    id: "settings", 
+    label: "Settings", 
+    path: "/admin/copilot/settings" 
+  }
 ]
 
 const industryMenuItems: MenuItem[] = [
